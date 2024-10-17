@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 
@@ -14,12 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Rollback(false)
 class StudentRepositoryTest {
 
     @Autowired
     StudentRepository studentRepository;
 
-    @BeforeEach
+    //    @BeforeEach
+    @Test
     void insertData() {
         Student s1 = Student.builder()
                 .name("쿠로미")
@@ -42,14 +45,13 @@ class StudentRepositoryTest {
     }
 
     @Test
-    @DisplayName("이름이 춘식이인 학색의 모든 정보를 조회한다.")
+    @DisplayName("이름이 춘식이인 학생의 모든 정보를 조회한다.")
     void findByNameTest() {
         // given
         String name = "춘식이";
 
         // when
         List<Student> list = studentRepository.findByName(name);
-//    void deleteByName(String name);
 
         // then
         assertEquals(1, list.size());
@@ -61,7 +63,7 @@ class StudentRepositoryTest {
 
     @Test
     @DisplayName("여러가지 조건을 쿼리메서드로 검색")
-    void QueryMethodTest() {
+    void queryMethodTest() {
         // given
         String city = "제주도";
         String major = "공학";
@@ -74,4 +76,50 @@ class StudentRepositoryTest {
         System.out.println(students.get(0));
         System.out.println("\n\n\n\n");
     }
+
+    @Test
+    @DisplayName("도시 또는 이름으로 학생을 조회합니다.")
+    void nativeSQLTest() {
+        // given
+        String name = "춘식이";
+        String city = "제주도";
+
+        // when
+        List<Student> students = studentRepository.getStudentByNameOrCity(name, city);
+
+        // then
+        System.out.println("\n\n\n\n");
+        students.forEach(stu -> System.out.println(stu));
+        System.out.println("\n\n\n\n");
+    }
+
+    @Test
+    @DisplayName("JPQL로 이름이 포함된 학생 목록 조회하기")
+    void jpqlTest() {
+        // given
+        String name = "춘";
+
+        // when
+        List<Student> students = studentRepository.searchByNameWithJPQL(name);
+
+        // then
+        System.out.println("\n\n\n\n");
+        students.forEach(stu -> System.out.println(stu));
+        System.out.println("\n\n\n\n");
+    }
+
+    @Test
+    @DisplayName("JPQL로 삭제하기")
+    void deleteJPQLTest() {
+        // given
+        String name = "어피치";
+        String city = "제주도";
+
+        // when
+        studentRepository.deleteByNameAndCityWithJPQL(name, city);
+
+        // then
+        assertEquals(0, studentRepository.findByName(name).size());
+    }
+
 }
