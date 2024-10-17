@@ -14,9 +14,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update # none, create, update, validate, create-drop
-    properties:
-      hibernate:
-        format_sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true # P6SpySqlFormatter
 
 # log level setting
 logging:
