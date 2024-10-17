@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Setter
 @Getter @ToString
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
