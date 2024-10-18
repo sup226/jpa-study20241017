@@ -5,12 +5,16 @@ import com.study.jpa.chap05.entity.Group;
 import com.study.jpa.chap05.entity.Idol;
 import com.study.jpa.chap05.entity.QIdol;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Id;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+
+import java.util.List;
+import java.util.Optional;
 
 import static com.study.jpa.chap05.entity.QIdol.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,6 +90,76 @@ class QueryDSLBasicTest {
         System.out.println("foundIdol = " + foundIdol);
         System.out.println("foundIdol.getGroup() = " + foundIdol.getGroup());
         System.out.println("\n\n\n\n");
+    }
+
+    @Test
+    @DisplayName("이름과 나이로 아이돌 조회하기")
+    void searchTest() {
+        // given
+
+        // when
+        Idol foundIdol = factory
+                .select(idol)
+                .from(idol)
+                .where(idol.idolName.eq("리즈").and(idol.age.eq(20)))
+                .fetchOne();
+
+        // then
+        System.out.println("\n\n\n\n");
+        System.out.println("foundIdol = " + foundIdol);
+        System.out.println("foundIdol.getGroup() = " + foundIdol.getGroup());
+        System.out.println("\n\n\n\n");
+
+//        idol.idolName.eq("리즈") // idolName = '리즈'
+//        idol.idolName.ne("리즈") // idolName != '리즈'
+//        idol.idolName.eq("리즈").not() // idolName != '리즈'
+//        idol.idolName.isNotNull() //이름이 is not null
+//        idol.age.in(10, 20) // age in (10,20)
+//        idol.age.notIn(10, 20) // age not in (10, 20)
+//        idol.age.between(10,30) //between 10, 30
+//        idol.age.goe(30) // age >= 30
+//        idol.age.gt(30) // age > 30
+//        idol.age.loe(30) // age <= 30
+//        idol.age.lt(30) // age < 30
+//        idol.idolName.like("_김%")  // like _김%
+//        idol.idolName.contains("김") // like %김%
+//        idol.idolName.startsWith("김") // like 김%
+//        idol.idolName.endsWith("김") // like %김
+    }
+    
+    @Test
+    @DisplayName("조회 결과 가져오기")
+    void fetchTest() {
+
+        List<Idol> idolList = factory
+                .select(idol)
+                .from(idol)
+                .fetch();
+
+        System.out.println("\n\n ========== fetch ==========");
+        idolList.forEach(System.out::println);
+
+        // 단일 행 조회 fetchOne
+        Idol foundIdol = factory
+                .select(idol)
+                .from(idol)
+                .where(idol.age.lt(21))
+                .fetchOne();
+
+        System.out.println("\n\n ========== fetchOne ==========");
+        System.out.println("foundIdol = " + foundIdol);
+
+
+        Optional<Idol> foundIdolOptional = Optional.ofNullable(factory
+                .select(idol)
+                .from(idol)
+                .where(idol.age.lt(21))
+                .fetchOne());
+
+        Idol foundIdol2 = foundIdolOptional.orElseThrow();
+
+        System.out.println("\n\n ========== fetchOne ==========");
+        System.out.println("foundIdol2 = " + foundIdol2);
     }
 
 }
